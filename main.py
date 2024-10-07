@@ -1,9 +1,10 @@
-#This will be used to run CLI commands and open/ send files
-import argparse
+import socket
+HOST = "127.0.0.1"
+PORT = 65432
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    s.sendall(b"Hello, world")
+    data = s.recv(1024)
+    s.close()
 
-
-parser=argparse.ArgumentParser()
-parser.add_argument("sub", choices=['Physics', 'Maths', 'Biology'])
-args=parser.parse_args()
-print ("My subject is ", args.sub)
-#Need to implement open server, connecting peer, and sending files commands
+print(f"Received {str(data)}")

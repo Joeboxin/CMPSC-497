@@ -58,10 +58,16 @@ def service_connection(key, mask):
 
 
 start_connections(HOST,PORT,2)
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(b"Hello, world")
-    data = s.recv(1024)
-    s.close()
-
-print(f"Received {str(data)}")
+try:
+    while True:
+        events = sel.select(timeout=None)
+        for key, mask in events:
+            if key.data is None:
+                accept_wrapper(key.fileobj)
+            else:
+                service_connection(key, mask)
+            
+except KeyboardInterrupt:
+    print("Caught keyboard interrupt, exiting")
+finally:
+    sel.close()
