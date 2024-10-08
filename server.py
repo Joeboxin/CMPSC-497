@@ -6,25 +6,21 @@ import types
 
 HOST = '127.0.0.1' # localhost
 PORT = 65432 # Port to listen on
+CHUNK_SIZE = 1024
+
 
 sel = selectors.DefaultSelector()
-#peers = []
-socket_list = []
-s = socket.socket()
-s.bind(('127.0.0.1', 8001))
-s.listen()
 
 def socket_target(conn):
     while True:
         data = conn.recv(1024)
         if not data:
-            break:
+            break
         conn.send(data)
 
 def accept_wrapper(sock):
     conn, addr = sock.accept()  # Should be ready to read
     print(f"Accepted connection from {addr}")
-    #peers.append(addr[0])
     conn.setblocking(False)
     data = types.SimpleNamespace(addr=addr, inb=b"", outb=b"")
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
@@ -47,13 +43,6 @@ def service_connection(key, mask):
             sent = sock.send(data.outb)  # Should be ready to write
             data.outb = data.outb[sent:]
 
-# def sendPeers(peers, connections):
-#     p = ""
-#     for peer in peers:
-#         p = p + peer+ ","
-#     for connection in connections:
-#         connection.send( b""+bytes(p, "utf-8"))
-
 host, port = HOST, PORT
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 lsock.bind((host, port))
@@ -62,11 +51,6 @@ print(f"Listening on {(host, port)}")
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
-
-while True:
-    conn, address = s.accept()
-    socket_list.append(conn)
-    #threading.Thread(target= socket_target, args = (conns,)).start
 try:
     while True:
         events = sel.select(timeout=None)

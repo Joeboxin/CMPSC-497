@@ -57,13 +57,6 @@ def service_connection(key, mask):
             data.outb = data.outb[sent:]
 
 
-s = socket.socket()
-s.connect((HOST,PORT))
-while True:
-    line = input("")
-    if line == "exit":
-        break
-    s.send(line.encode("unf-8"))
 start_connections(HOST,PORT,2)
 try:
     while True:
